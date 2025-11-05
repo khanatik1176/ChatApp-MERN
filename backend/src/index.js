@@ -4,18 +4,28 @@ import messageRoutes from './routes/message.route.js';
 import dotenv from 'dotenv';
 import { connectDB } from './lib/db.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { app, server } from './lib/socket.js';
 
-const app = express(); // Create an Express application instance
+// const app = express(); // Create an Express application instance
 
 dotenv.config(); // Load environment variables from .env file
 const PORT = process.env.PORT || 5001;
+
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true
+    }
+)); // Enable CORS
 
 app.use(express.json());
 app.use(cookieParser()); // This will extract JSON data from incoming requests
 app.use("/api/auth", authRoutes); // Mount the auth routes at /api/auth
 app.use("/api/message", messageRoutes); // Mount the message routes at /api/messages
 
-app.listen(PORT, () => 
+
+server.listen(PORT, () => 
 {
     console.log('Server is running on port:', PORT);
     connectDB(); // Connect to the database when the server starts
