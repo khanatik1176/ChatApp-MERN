@@ -68,3 +68,31 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export const editMessage = async (req,res) => 
+{
+  try {
+
+    const {text} = req.body;
+    const {id : messageId} = req.params;
+    const senderId = req.user._id;
+
+    const message = await Message.findOne({_id: messageId, senderId: senderId});
+
+    if(!message)
+    {
+      return res.status(404).json({error: "Message not found or you are not authorized to edit this message"});
+    }
+
+    message.text = text;
+    await message.save();
+
+    res.status(200).json(message);
+
+
+    
+  } catch (error) {
+    
+  }
+}
