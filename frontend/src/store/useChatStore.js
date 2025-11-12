@@ -43,6 +43,34 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  updateMessage: async (messageId, updateData) => 
+  {
+    const { messages } = get();
+    try {
+      const res = await axiosInstance.patch(`/messages/update/${messageId}`, updateData);
+      const updatedMessage = res.data;
+
+      const updatedMessages = messages.map((msg) =>
+        msg._id === messageId ? updatedMessage : msg
+      );
+      set({ messages: updatedMessages });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
+  deleteMessage: async (messageId) =>
+  {
+    const { messages } = get();
+    try {
+      await axiosInstance.delete(`/messages/delete/${messageId}`);
+      const updatedMessages = messages.filter((msg) => msg._id !== messageId);
+      set({ messages: updatedMessages });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;

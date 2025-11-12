@@ -35,6 +35,7 @@ export const getMessages = async (req, res) => {
   }
 };
 
+
 export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
@@ -76,9 +77,8 @@ export const editMessage = async (req,res) =>
 
     const {text} = req.body;
     const {id : messageId} = req.params;
-    const senderId = req.user._id;
 
-    const message = await Message.findOne({_id: messageId, senderId: senderId});
+    const message = await Message.findOne({_id: messageId});
 
     if(!message)
     {
@@ -94,5 +94,27 @@ export const editMessage = async (req,res) =>
     
   } catch (error) {
     
+  }
+}
+
+export const deleteMessage = async (req,res) =>
+{
+  try {
+
+    const {id : messageId} = req.params;
+
+    const message = await Message.findOne({_id: messageId});
+
+    if(!message)
+    {
+      return res.status(404).json({error: "Message not found or you are not authorized to delete this message"});
+    }
+
+    await Message.deleteOne({_id: messageId});
+    res.status(200).json({ message: "Message deleted successfully" });
+    
+  } catch (error) {
+      console.log("Error in deleteMessage controller: ", error.message);
+      res.status(500).json({ error: "Internal server error" });
   }
 }
